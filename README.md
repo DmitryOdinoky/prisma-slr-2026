@@ -73,7 +73,7 @@ The pipeline uses these free API keys (set as variables in `prisma_pipeline.py`)
 ### Run the pipeline
 
 ```bash
-cd src
+cd src  # or 'workspace' if running locally
 
 # Full pipeline: search + deduplicate + screen
 python prisma_pipeline.py --all
