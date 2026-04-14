@@ -1,0 +1,64 @@
+# ── PDFs (large binary files) ──
+*.pdf
+
+# ── Word documents ──
+*.docx
+*.doc
+
+# ── LaTeX source and artifacts ──
+*.tex
+*.aux
+*.log
+*.out
+*.spl
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+
+# ── Excel files (contain data, provided separately) ──
+*.xlsx
+*.xls
+
+# ── CSV operational artifacts ──
+*.csv
+
+# ── JSON artifacts ──
+*.json
+
+# ── Python cache ──
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# ── IDE / editor ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS artifacts ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── PDF folders ──
+pdfs/
+pdfs_final_69/
+pdfs_manual/
+pdfs_manual_old/
+pdfs_new_13apr/
+pdfs_included/
+
+# ── Working directory ──
+workspace/
+
+# ── Local config ──
+.cl*/
+prompt_for_*_browser.md
