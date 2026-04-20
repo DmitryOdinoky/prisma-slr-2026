@@ -1,123 +1,158 @@
-# PRISMA Systematic Literature Review: ML Methods for Vessel Performance Prediction
+# PRISMA SLR: ML Methods for Vessel Performance Prediction
 
-A PRISMA 2020-compliant systematic literature review of machine learning methods applied to vessel performance prediction and propulsion modeling.
+PRISMA 2020 systematic literature review of machine learning methods for vessel performance prediction and propulsion modelling.
 
-**Paper:** *Machine Learning Methods for Vessel Performance Prediction and Propulsion Modeling: A Systematic Literature Review*  
-**Author:** Dmitrijs Odinokijs (Riga Technical University / SIA ShipProjects)  
-**Preprint submitted to:** Ocean Engineering  
+**Author:** Dmitrijs Odinokijs (RTU / SIA ShipProjects)
 
-## Overview
-
-This repository contains the reproducible search pipeline and analysis code for a systematic review covering:
-
-1. **ML baselines** for fuel consumption, speed, and power prediction (T1, 60 papers)
-2. **Physics-hybrid architectures** — grey-box models, physics-informed neural networks (T2, 27 papers)
-3. **Feature engineering** for maritime sensor time series (T3, 15 papers)
-4. **Online adaptation** and real-time recalibration of deployed models (T4, 9 papers)
-5. **Explainability** — SHAP, LIME for propulsion models (T6, 5 papers)
-
-**Key finding:** Literature routinely reports R² = 0.95–0.99, but this is systematically inflated by random k-fold splitting on time-series data (data leakage). Under temporally rigorous holdout protocols, R² = 0.75–0.95. In production deployment without feature engineering, R² ≈ 0.30–0.40; with systematic feature engineering, R² ≈ 0.60–0.70.
-
-## PRISMA Flow
+## PRISMA flow (April 2026)
 
 ```
-869 raw records (4 databases + manual)
- → 575 after deduplication (DOI + fuzzy title matching)
-   → 181 after title screening (3 passes)
-     → 137 after abstract screening
-       → 116 included studies (full-text assessed)
+913 raw records (5 databases)
+ → 593 after deduplication
+   → 358 after title screening
+     → 193 after abstract screening (incl. 32 manual exclusions)
+       → 174 full-text PDFs retrievable (final corpus)
+           19 not retrievable (paywalled — documented)
 ```
 
-**Databases searched (April 14, 2026):** Semantic Scholar (279), OpenAlex (400), arXiv (9), Scopus (176), manual (5)
-
-## Repository Structure
+## Repository structure
 
 ```
-├── README.md                           # This file
-├── src/
-│   ├── prisma_pipeline.py              # Main search + screening pipeline
-│   ├── build_q1_report.py              # LIAA Q1 report generator (Latvian)
-│   └── manuscript_revision_instructions.md
-└── .gitignore
+src/                            Core reproducible pipeline
+  prisma_pipeline.py            Search 5 databases + dedup + title screen
+  abstract_screen.py            Abstract-level screening with Crossref backfill
+  pdf_inventory.py              Match records to PDFs, reject abstract-only (<4 pages)
+  extract_paper_content.py      Heuristic metadata extraction from PDFs
+  finalize_corpus.py            PRISMA flow counts + final_corpus.csv
+  citation_utils.py             Shared bibliography/citation helpers
+  run_pipeline.sh               End-to-end driver script
+
+src/helpers/                    PDF retrieval aids (not needed for reproduction)
+  fetch_oa_pdfs.py              Auto-fetch via Unpaywall / Semantic Scholar / OpenAlex
+  find_links.py                 Find OA link candidates for missing PDFs
+  paywalled_list.py             Generate publisher-grouped HTML for manual fetch
+  make_priority_list.py         Priority HTML list
+  build_not_retrievable_html.py Interactive HTML for tracking manual downloads
+
+src/reports/                    Report generators (LIAA deliverables)
+  build_q1_report.py            Latvian Q1 literature review (.docx)
+  build_q1_deliverables.py      Full LIAA Q1 delivery package
+  build_slr_manuscript.py       LaTeX SLR paper + compile to PDF
+
+src/baselineTrainerValidator/   Baseline model (gitignored — proprietary data)
+workspace/                      PDFs, outputs, deliverables (gitignored)
+templates/                      Report templates (gitignored)
 ```
 
-**Not tracked (available on request):**
-- `PRISMA_search_results_2026-04-14.xlsx` — full Excel with all sheets
-- `PRISMA_AI_Search_Log_v2_verified.xlsx` — verified metrics version
-- `*.csv` — raw records, deduplicated records, screening results
-- `pdfs_*` — collected PDF papers
-- `SLR_final_v2.tex` / `SLR_final_v2.pdf` — manuscript
-- `Q1_Literaturas_Parskats_LIAA.docx` — LIAA Q1 deliverable
-
-## Setup and Reproduction
-
-### Prerequisites
+## Setup
 
 ```bash
-# Python 3.10+
-pip install scholarly rapidfuzz openpyxl requests pdfminer.six python-docx PyPDF2
+pip install requests rapidfuzz openpyxl pdfminer.six PyPDF2 python-docx xgboost joblib
+# For LaTeX compilation:
+sudo apt install texlive-xetex texlive-latex-recommended texlive-fonts-recommended texlive-bibtex-extra
 ```
 
-### API Keys
+### API keys
 
-The pipeline uses these free API keys (set as variables in `prisma_pipeline.py`):
-
-| API | How to get | Required? |
-|-----|-----------|-----------|
-| Semantic Scholar | https://www.semanticscholar.org/product/api | Yes (free, apply for key) |
-| Scopus / Elsevier | https://dev.elsevier.com/ | Yes (free, institutional) |
-| IEEE Xplore | https://developer.ieee.org/ | Optional (was unavailable during this study) |
-| OpenAlex | No key needed | — |
-| arXiv | No key needed | — |
-
-### Run the pipeline
+Keys must be set as environment variables — never hardcoded.
 
 ```bash
-cd src  # or 'workspace' if running locally
-
-# Full pipeline: search + deduplicate + screen
-python prisma_pipeline.py --all
-
-# This produces:
-#   search_log.csv          — 20 database-string entries
-#   records_raw.csv         — all raw records
-#   records_deduplicated.csv — unique records
-#   title_screened.csv      — screening decisions
-#   PRISMA_search_results_YYYY-MM-DD.xlsx
+export SS_API_KEY="your-semantic-scholar-key"      # https://www.semanticscholar.org/product/api
+export SCOPUS_API_KEY="your-scopus-key"            # https://dev.elsevier.com/
+export IEEE_API_KEY="your-ieee-xplore-key"         # https://developer.ieee.org/
 ```
 
-### Reproduce screening
+OpenAlex and arXiv do not require keys.
 
-The pipeline includes three screening passes:
-1. **Title Pass 1** — keyword-based PASS/FAIL/MAYBE
-2. **Title Pass 2** — extended rules for MAYBE refinement (built into `prisma_pipeline.py`)
-3. **Abstract screening** — run separately after Pass 2 (see `title_screened.csv`)
+## Reproduction guide
 
-Full-text screening and metric extraction require manual PDF review.
+### What is fully reproducible
 
-### Generate LIAA Q1 report
+Running `src/run_pipeline.sh` with the same API keys and date will produce:
+- **Identical search results** (same queries → same database responses, ±minor indexing changes)
+- **Identical deduplication** (deterministic DOI + fuzzy title matching, threshold 90%)
+- **Identical title screening** (keyword rules hardcoded in `prisma_pipeline.py`)
+- **Identical abstract screening** (keyword rules in `abstract_screen.py`)
+- **Identical PDF validity check** (page count ≥4, text length ≥6000 chars)
+- **Identical content extraction** (regex-based, deterministic)
+
+### What is NOT reproducible (and why)
+
+Three steps in this SLR involved subjective human judgement:
+
+1. **Manual exclusions (32 papers).** After automated screening, 32 papers were manually excluded as out-of-scope based on the reviewer's reading of their titles and abstracts. These papers passed the keyword-based screening but were judged irrelevant upon closer inspection (e.g., papers about ship detection from satellite imagery, non-propulsion maritime topics). The excluded IDs are applied in `run_pipeline.sh` as a hardcoded list; a different reviewer might exclude a partially different set.
+
+2. **PDF collection.** The final corpus depends on which PDFs could be obtained. Our policy was: OA papers (Unpaywall, OpenAlex, Semantic Scholar, arXiv) + a manually curated set obtained via ResearchGate, author pages, and prior collection. A researcher with different institutional access would obtain a partially different set. We document the 19 unretrievable records in `not_retrievable.csv`.
+
+3. **Thematic narrative synthesis.** The cluster-level narratives (T1–T6 discussions) in the manuscript and Q1 report were written by the primary reviewer after reading the full-text corpus. A different reviewer reading the same papers may emphasise different aspects or draw partially different conclusions. The structured data (`paper_extractions.json`, `feature_frequency.csv`) is deterministic; the interpretive narrative is inherently reviewer-dependent.
+
+### Step-by-step reproduction
 
 ```bash
-python build_q1_report.py
-# Produces: Q1_Literaturas_Parskats_LIAA.docx
+cd src
+
+# 1. Automated pipeline (deterministic)
+export SS_API_KEY="..." SCOPUS_API_KEY="..." IEEE_API_KEY="..."
+python3 prisma_pipeline.py --all
+python3 abstract_screen.py
+
+# 2. Apply manual exclusions (reviewer judgement — list provided)
+python3 -c "
+import csv
+exclude = {'REC-560','REC-562','REC-508','REC-454','REC-127','REC-590',
+           'REC-580','REC-531','REC-411','REC-589','REC-150','REC-573',
+           'REC-586','REC-593','REC-131','REC-567','REC-205','REC-403',
+           'REC-588','REC-587','REC-529','REC-577','REC-582','REC-518',
+           'REC-570','REC-514','REC-087','REC-532','REC-563','REC-583',
+           'REC-062','REC-517'}
+# ... (see run_pipeline.sh for full script)
+"
+
+# 3. PDF matching (depends on which PDFs you have on disk)
+python3 pdf_inventory.py
+
+# 4. OA fetching (optional — fetches what's freely available)
+cd helpers
+python3 find_links.py
+python3 fetch_oa_pdfs.py
+cd ..
+python3 pdf_inventory.py    # re-run to pick up fetched
+
+# 5. Finalize + extract
+python3 finalize_corpus.py
+python3 extract_paper_content.py
+
+# 6. Reports (optional — LIAA-specific)
+cd reports
+python3 build_q1_report.py
+python3 build_slr_manuscript.py
 ```
 
-## Search Strings
+### Reproducing with a different PDF set
 
-| String | Focus | Query |
-|--------|-------|-------|
-| A | Core propulsion | `("ship" OR "vessel") AND ("fuel consumption" OR "speed prediction" OR "power prediction" OR "propulsion model") AND ("machine learning" OR "data-driven") AND ("sensor data" OR "operational data" OR "in-service data" OR "onboard data" OR "noon report" OR "voyage data")` |
-| B | Feature engineering | `("ship" OR "vessel") AND ("feature engineering" OR "feature selection" OR "variable selection" OR "input features") AND ("propulsion" OR "fuel consumption" OR "speed prediction" OR "vessel performance") AND ("machine learning" OR "data-driven")` |
-| C | Physics-hybrid | `("ship" OR "vessel") AND ("physics-informed" OR "physics-based" OR "semi-empirical" OR "resistance model" OR "grey-box" OR "physics-guided") AND ("machine learning" OR "data-driven") AND ("propulsion" OR "fuel consumption" OR "speed prediction" OR "power prediction" OR "vessel performance" OR "ship performance")` |
-| D | Real-time recalibration | `("ship" OR "vessel") AND ("model updating" OR "online learning" OR "adaptive model" OR "bias correction" OR "real-time calibration" OR "concept drift" OR "model drift" OR "sliding window") AND ("propulsion" OR "fuel consumption" OR "speed prediction" OR "vessel performance" OR "prediction model")` |
+If you have institutional access to paywalled journals:
+1. Download additional PDFs into `workspace/pdfs_custom/`
+2. Add the folder name to `PDF_DIRS` in `src/pdf_inventory.py`
+3. Re-run from step 3 onward
+
+The 19 records in `not_retrievable.csv` are the most likely candidates to improve corpus coverage.
+
+## Search strings
+
+| ID | Focus | Core query |
+|----|-------|-----------|
+| A | Propulsion modelling | `("ship" OR "vessel") AND ("fuel consumption" OR "speed prediction" OR ...) AND ("machine learning" OR "data-driven") AND ("sensor data" OR "operational data" OR ...)` |
+| B | Feature engineering | `("ship" OR "vessel") AND ("feature engineering" OR "feature selection" OR ...) AND ("propulsion" OR ...) AND ("machine learning" OR ...)` |
+| C | Physics-hybrid | `("ship" OR "vessel") AND ("physics-informed" OR "grey-box" OR ...) AND ("machine learning" OR ...) AND ("propulsion" OR ...)` |
+| D | Online adaptation | `("ship" OR "vessel") AND ("model updating" OR "online learning" OR "concept drift" OR ...) AND ("propulsion" OR ...)` |
+
+Full strings in `src/prisma_pipeline.py`.
 
 ## Citation
 
-If you use this pipeline or findings, please cite:
-
 ```bibtex
 @article{odinokijs2026slr,
-  title={Machine Learning Methods for Vessel Performance Prediction and 
+  title={Machine Learning Methods for Vessel Performance Prediction and
          Propulsion Modeling: A Systematic Literature Review},
   author={Odinokijs, Dmitrijs},
   journal={Ocean Engineering (preprint)},
@@ -127,7 +162,7 @@ If you use this pipeline or findings, please cite:
 
 ## Acknowledgments
 
-This work was conducted as part of a research project funded by LIAA (Investment and Development Agency of Latvia) at SIA ShipProjects, in conjunction with doctoral studies at Riga Technical University.
+Funded by LIAA (Investment and Development Agency of Latvia) at SIA ShipProjects, in conjunction with doctoral studies at Riga Technical University.
 
 ## License
 

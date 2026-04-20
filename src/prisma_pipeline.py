@@ -23,9 +23,16 @@ from rapidfuzz import fuzz
 WORK_DIR = os.path.dirname(os.path.abspath(__file__))
 TODAY = date.today().isoformat()
 
-SS_API_KEY = "YOUR_SS_API_KEY_HERE"
-SCOPUS_API_KEY = "YOUR_SCOPUS_API_KEY_HERE"
-IEEE_API_KEY = os.environ.get("IEEE_API_KEY", "YOUR_IEEE_API_KEY_HERE")
+# API keys — set as environment variables before running.
+#   export SS_API_KEY="your-key"    (https://www.semanticscholar.org/product/api)
+#   export SCOPUS_API_KEY="your-key" (https://dev.elsevier.com/)
+#   export IEEE_API_KEY="your-key"   (https://developer.ieee.org/)
+SS_API_KEY     = os.environ.get("SS_API_KEY", "")
+SCOPUS_API_KEY = os.environ.get("SCOPUS_API_KEY", "")
+IEEE_API_KEY   = os.environ.get("IEEE_API_KEY", "")
+
+if not all([SS_API_KEY, SCOPUS_API_KEY, IEEE_API_KEY]):
+    print("WARNING: API keys not set. Export SS_API_KEY, SCOPUS_API_KEY, IEEE_API_KEY.")
 
 STRINGS = {
     "A": '("ship" OR "vessel") AND ("fuel consumption" OR "speed prediction" OR "power prediction" OR "propulsion model") AND ("machine learning" OR "data-driven") AND ("sensor data" OR "operational data" OR "in-service data" OR "onboard data" OR "noon report" OR "voyage data")',
