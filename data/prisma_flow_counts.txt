@@ -1,0 +1,29 @@
+PRISMA Flow Counts — reproducible OA corpus (2026-04-15)
+========================================================
+
+Identification:
+  IEEE Xplore          49
+  OpenAlex             400
+  Scopus               176
+  Semantic Scholar     279
+  arXiv                9
+  TOTAL raw            913  (see records_raw.csv)
+
+Screening:
+  After dedup                : 593
+  After title screening      : 358  (PASS=173 + MAYBE=185; FAIL=235)
+  After abstract screening   : 193  (INCLUDE + UNCERTAIN)
+    - INCLUDE                : 124
+    - UNCERTAIN              : 69
+    - EXCLUDE                : 165
+
+Full-text retrieval:
+  PDFs retrievable           : 174  (→ final_corpus.csv)
+  Not retrievable            : 19  (→ not_retrievable.csv)
+    by decision: INCLUDE=11  UNCERTAIN=8
+
+Reproducibility note:
+  The corpus uses only openly retrievable PDFs (OA via Unpaywall/arXiv/
+  OpenAlex + publisher-provided OA) plus a curated ResearchGate/author-
+  provided set. Paywalled records with no openly retrievable PDF are
+  documented in not_retrievable.csv as a PRISMA limitation.

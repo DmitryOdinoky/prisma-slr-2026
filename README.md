@@ -39,6 +39,17 @@ src/reports/                    Report generators (LIAA deliverables)
   build_q1_deliverables.py      Full LIAA Q1 delivery package
   build_slr_manuscript.py       LaTeX SLR paper + compile to PDF
 
+data/                           Supplementary data (tracked, for reproducibility)
+  search_log.csv                20 queries across 5 databases
+  records_raw.csv               913 raw records
+  records_deduplicated.csv      593 unique records after DOI + fuzzy dedup
+  title_screened.csv            593 records with PASS/FAIL/MAYBE
+  abstract_screened.csv         593 records with INCLUDE/UNCERTAIN/EXCLUDE
+  final_corpus.csv              174 included studies with metadata + PDF paths
+  not_retrievable.csv           19 paywalled records (PRISMA limitation)
+  prisma_flow_counts.txt        Record counts at each screening stage
+  PRISMA_search_results.xlsx    Full Excel (5 sheets: logs, dedup, screened, corpus, not-retr)
+
 src/baselineTrainerValidator/   Baseline model (gitignored — proprietary data)
 workspace/                      PDFs, outputs, deliverables (gitignored)
 templates/                      Report templates (gitignored)
@@ -82,7 +93,7 @@ Three steps in this SLR involved subjective human judgement:
 
 1. **Manual exclusions (32 papers).** After automated screening, 32 papers were manually excluded as out-of-scope based on the reviewer's reading of their titles and abstracts. These papers passed the keyword-based screening but were judged irrelevant upon closer inspection (e.g., papers about ship detection from satellite imagery, non-propulsion maritime topics). The excluded IDs are applied in `run_pipeline.sh` as a hardcoded list; a different reviewer might exclude a partially different set.
 
-2. **PDF collection.** The final corpus depends on which PDFs could be obtained. Our policy was: OA papers (Unpaywall, OpenAlex, Semantic Scholar, arXiv) + a manually curated set obtained via ResearchGate, author pages, and prior collection. A researcher with different institutional access would obtain a partially different set. We document the 19 unretrievable records in `not_retrievable.csv`.
+2. **PDF collection.** Full-text retrieval combined three sources: (i) a personal collection of relevant papers accumulated over two years of active research; (ii) open-access PDFs obtained programmatically via Unpaywall, OpenAlex, Semantic Scholar, and arXiv; and (iii) paywalled papers accessed through Riga Technical University's institutional library subscriptions. A researcher with different institutional access may obtain a partially different set. The 19 papers that were not available through RTU's subscriptions are documented in `not_retrievable.csv`.
 
 3. **Thematic narrative synthesis.** The cluster-level narratives (T1–T6 discussions) in the manuscript and Q1 report were written by the primary reviewer after reading the full-text corpus. A different reviewer reading the same papers may emphasise different aspects or draw partially different conclusions. The structured data (`paper_extractions.json`, `feature_frequency.csv`) is deterministic; the interpretive narrative is inherently reviewer-dependent.
 
