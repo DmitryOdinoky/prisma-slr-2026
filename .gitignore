@@ -1,11 +1,18 @@
-# ── PDFs (large binary files) ──
+# ── Binary / generated files ──
 *.pdf
-
-# ── Word documents ──
 *.docx
 *.doc
+*.xlsx
+*.xls
+*.csv
+*.json
+*.joblib
+*.ubj
+*.pkl
+*.png
+*.jpg
 
-# ── LaTeX source and artifacts ──
+# ── LaTeX artifacts ──
 *.tex
 *.aux
 *.log
@@ -20,47 +27,32 @@
 *.lof
 *.lot
 
-# ── Excel files (contain data, provided separately) ──
-*.xlsx
-*.xls
-
-# ── CSV operational artifacts ──
-*.csv
-
-# ── JSON artifacts ──
-*.json
-
 # ── Python cache ──
 __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
 
-# ── IDE / editor ──
+# ── IDE / editor / OS ──
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# ── OS artifacts ──
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ── PDF folders ──
-pdfs/
-pdfs_final_69/
-pdfs_manual/
-pdfs_manual_old/
-pdfs_new_13apr/
-pdfs_included/
-
-# ── Working directory ──
+# ── Workspace (all outputs, deliverables, PDFs, raw data) ──
 workspace/
+
+# ── Templates (proprietary report templates) ──
+templates/
+
+# ── Baseline trainer (proprietary data + model artifacts) ──
+src/baselineTrainerValidator/
 
 # ── Local config ──
 .cl*/
 prompt_for_*_browser.md
 manuscript_revision_instructions.md
-templates
