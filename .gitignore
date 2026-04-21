@@ -60,3 +60,4 @@ manuscript_revision_instructions.md
 # ── Exceptions: supplementary data tracked for reproducibility ──
 !data/
 !data/**
+src/reports
