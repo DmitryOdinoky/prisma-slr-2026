@@ -52,6 +52,12 @@ templates/
 # ── Baseline trainer (proprietary data + model artifacts) ──
 src/baselineTrainerValidator/
 
+# ── Helpers (internal PDF fetch/download tools, not needed for reproduction) ──
+src/helpers/
+
+# ── Report generators (LIAA/RTU deliverables, proprietary) ──
+src/reports/
+
 # ── Local config ──
 .cl*/
 prompt_for_*_browser.md
@@ -60,4 +66,3 @@ manuscript_revision_instructions.md
 # ── Exceptions: supplementary data tracked for reproducibility ──
 !data/
 !data/**
-src/reports
