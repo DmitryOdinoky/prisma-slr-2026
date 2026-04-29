@@ -162,18 +162,18 @@ Full strings in `src/prisma_pipeline.py`.
 ## Citation
 
 ```bibtex
-@article{odinokijs2026slr,
-  title={Machine Learning Methods for Vessel Performance Prediction and
-         Propulsion Modeling: A Systematic Literature Review},
-  author={Odinokijs, Dmitrijs},
-  journal={Ocean Engineering (preprint)},
-  year={2026}
-}
+@unpublished{odinokijs2026slr,
+    title={Machine Learning Methods for Vessel Performance Prediction and
+           Propulsion Modeling: A Systematic Literature Review},
+    author={Odinokijs, Dmitrijs},
+    note={Manuscript in preparation},
+    year={2026}
+  }
 ```
 
 ## Acknowledgments
 
-Funded by LIAA (Investment and Development Agency of Latvia) at SIA ShipProjects, in conjunction with doctoral studies at Riga Technical University.
+Conducted at SIA ShipProjects in conjunction with doctoral studies at Riga Technical University.
 
 ## License
 
