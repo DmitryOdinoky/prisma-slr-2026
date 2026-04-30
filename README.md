@@ -4,16 +4,25 @@ PRISMA 2020 systematic literature review of machine learning methods for vessel 
 
 **Author:** Dmitrijs Odinokijs (RTU / SIA ShipProjects)
 
-## PRISMA flow (April 2026)
+## PRISMA flow (search executed 17 April 2026)
 
 ```
-913 raw records (5 databases)
+913 raw records (5 databases: Semantic Scholar 279, OpenAlex 400,
+                              Scopus 176, IEEE Xplore 49, arXiv 9)
  → 593 after deduplication
-   → 358 after title screening
-     → 193 after abstract screening (incl. 32 manual exclusions)
-       → 174 full-text PDFs retrievable (final corpus)
-           19 not retrievable (paywalled — documented)
+   → 400 after title screening (PASS 215 + MAYBE 185; FAIL 193)
+     → 217 after abstract screening (INCLUDE 136 + UNCERTAIN 81;
+                                     EXCLUDE 183)
+       → 196 full-text PDFs retrievable (final corpus)
+          21 not retrievable (paywalled — documented)
 ```
+
+The 215 title-stage PASS count includes 42 records that were re-admitted
+through manual reviewer judgement after the automated keyword screen
+flagged them as FAIL (titles too short or generic for the keyword rules
+to act on, but on inspection clearly in scope). These are recorded with
+the value `reconsider` in the `Title Screened` sheet of the Excel
+workbook and merged with the automated `PASS` set in `title_screened.csv`.
 
 ## Repository structure
 
@@ -44,9 +53,9 @@ data/                           Supplementary data (tracked, for reproducibility
   records_raw.csv               913 raw records
   records_deduplicated.csv      593 unique records after DOI + fuzzy dedup
   title_screened.csv            593 records with PASS/FAIL/MAYBE
-  abstract_screened.csv         593 records with INCLUDE/UNCERTAIN/EXCLUDE
-  final_corpus.csv              174 included studies with metadata + PDF paths
-  not_retrievable.csv           19 paywalled records (PRISMA limitation)
+  abstract_screened.csv         400 records (title PASS+MAYBE) with INCLUDE/UNCERTAIN/EXCLUDE
+  final_corpus.csv              196 included studies with metadata + PDF paths
+  not_retrievable.csv           21 paywalled records (PRISMA limitation)
   prisma_flow_counts.txt        Record counts at each screening stage
   PRISMA_search_results.xlsx    Full Excel (5 sheets: logs, dedup, screened, corpus, not-retr)
 
@@ -91,9 +100,9 @@ Running `src/run_pipeline.sh` with the same API keys and date will produce:
 
 Three steps in this SLR involved subjective human judgement:
 
-1. **Manual exclusions (32 papers).** After automated screening, 32 papers were manually excluded as out-of-scope based on the reviewer's reading of their titles and abstracts. These papers passed the keyword-based screening but were judged irrelevant upon closer inspection (e.g., papers about ship detection from satellite imagery, non-propulsion maritime topics). The excluded IDs are applied in `run_pipeline.sh` as a hardcoded list; a different reviewer might exclude a partially different set.
+1. **Manual title-screen reconsideration (42 papers).** After the automated keyword title screen produced PASS=173, MAYBE=185, FAIL=235, the reviewer re-examined the 235 FAIL records and re-admitted 42 of them as in-scope (titles that the keyword rules could not classify reliably — typically very short titles or those that name a model architecture rather than the application domain). These 42 records appear with `title_screen=PASS` in `data/title_screened.csv` and are tagged `reconsider` in the Excel workbook so the original automated decision is preserved. Net effect: 173 + 42 + 185 MAYBE = 400 records forwarded to abstract screening. A different reviewer might re-admit a partially different set.
 
-2. **PDF collection.** Full-text retrieval combined three sources: (i) a personal collection of relevant papers accumulated over two years of active research; (ii) open-access PDFs obtained programmatically via Unpaywall, OpenAlex, Semantic Scholar, and arXiv; and (iii) paywalled papers accessed through Riga Technical University's institutional library subscriptions. A researcher with different institutional access may obtain a partially different set. The 19 papers that were not available through RTU's subscriptions are documented in `not_retrievable.csv`.
+2. **PDF collection.** Full-text retrieval combined three sources: (i) a personal collection of relevant papers accumulated over two years of active research; (ii) open-access PDFs obtained programmatically via Unpaywall, OpenAlex, Semantic Scholar, and arXiv; and (iii) paywalled papers accessed through Riga Technical University's institutional library subscriptions. A researcher with different institutional access may obtain a partially different set. The 21 papers that were not available through any of these channels are documented in `not_retrievable.csv`.
 
 3. **Thematic narrative synthesis.** The cluster-level narratives (T1–T6 discussions) in the manuscript and Q1 report were written by the primary reviewer after reading the full-text corpus. A different reviewer reading the same papers may emphasise different aspects or draw partially different conclusions. The structured data (`paper_extractions.json`, `feature_frequency.csv`) is deterministic; the interpretive narrative is inherently reviewer-dependent.
 
@@ -105,19 +114,19 @@ cd src
 # 1. Automated pipeline (deterministic)
 export SS_API_KEY="..." SCOPUS_API_KEY="..." IEEE_API_KEY="..."
 python3 prisma_pipeline.py --all
-python3 abstract_screen.py
+#   → records_raw.csv (913), records_deduplicated.csv (593),
+#     title_screened.csv (PASS=173, MAYBE=185, FAIL=235)
 
-# 2. Apply manual exclusions (reviewer judgement — list provided)
-python3 -c "
-import csv
-exclude = {'REC-560','REC-562','REC-508','REC-454','REC-127','REC-590',
-           'REC-580','REC-531','REC-411','REC-589','REC-150','REC-573',
-           'REC-586','REC-593','REC-131','REC-567','REC-205','REC-403',
-           'REC-588','REC-587','REC-529','REC-577','REC-582','REC-518',
-           'REC-570','REC-514','REC-087','REC-532','REC-563','REC-583',
-           'REC-062','REC-517'}
-# ... (see run_pipeline.sh for full script)
-"
+# 2. Manual title-screen reconsideration (reviewer judgement)
+#    Re-admit 42 records from FAIL → PASS using the reference set in
+#    data/title_screened.csv (column title_screen). The IDs that were
+#    re-admitted by this review are exactly the rows whose title_screen
+#    is PASS in data/title_screened.csv but whose automated rules would
+#    have produced FAIL — see the Excel workbook (Title Screened sheet,
+#    value 'reconsider') for the audit trail.
+
+python3 abstract_screen.py
+#   → abstract_screened.csv (400 forwarded; INCLUDE=136, UNCERTAIN=81, EXCLUDE=183)
 
 # 3. PDF matching (depends on which PDFs you have on disk)
 python3 pdf_inventory.py
@@ -131,6 +140,7 @@ python3 pdf_inventory.py    # re-run to pick up fetched
 
 # 5. Finalize + extract
 python3 finalize_corpus.py
+#   → final_corpus.csv (196), not_retrievable.csv (21), prisma_flow_counts.txt
 python3 extract_paper_content.py
 
 # 6. Reports (optional — LIAA-specific)
@@ -146,7 +156,7 @@ If you have institutional access to paywalled journals:
 2. Add the folder name to `PDF_DIRS` in `src/pdf_inventory.py`
 3. Re-run from step 3 onward
 
-The 19 records in `not_retrievable.csv` are the most likely candidates to improve corpus coverage.
+The 21 records in `not_retrievable.csv` are the most likely candidates to improve corpus coverage.
 
 ## Search strings
 

@@ -1,4 +1,4 @@
-PRISMA Flow Counts — reproducible OA corpus (2026-04-15)
+PRISMA Flow Counts — reproducible OA corpus (2026-04-17)
 ========================================================
 
 Identification:
@@ -11,16 +11,16 @@ Identification:
 
 Screening:
   After dedup                : 593
-  After title screening      : 358  (PASS=173 + MAYBE=185; FAIL=235)
-  After abstract screening   : 193  (INCLUDE + UNCERTAIN)
-    - INCLUDE                : 124
-    - UNCERTAIN              : 69
-    - EXCLUDE                : 165
+  After title screening      : 400  (PASS=215 + MAYBE=185; FAIL=193)
+  After abstract screening   : 217  (INCLUDE + UNCERTAIN)
+    - INCLUDE                : 136
+    - UNCERTAIN              : 81
+    - EXCLUDE                : 183
 
 Full-text retrieval:
-  PDFs retrievable           : 174  (→ final_corpus.csv)
-  Not retrievable            : 19  (→ not_retrievable.csv)
-    by decision: INCLUDE=11  UNCERTAIN=8
+  PDFs retrievable           : 196  (→ final_corpus.csv)
+  Not retrievable            : 21  (→ not_retrievable.csv)
+    by decision: INCLUDE=10  UNCERTAIN=11
 
 Reproducibility note:
   The corpus uses only openly retrievable PDFs (OA via Unpaywall/arXiv/

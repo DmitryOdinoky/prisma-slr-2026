@@ -9,6 +9,7 @@ set already on disk. Paywalled records with no PDF on disk are excluded
 with reason 'not-retrievable' (a standard PRISMA exclusion).
 """
 import csv
+from datetime import date
 from pathlib import Path
 from collections import Counter
 
@@ -93,7 +94,7 @@ def main():
 
     # PRISMA flow
     lines = [
-        "PRISMA Flow Counts — reproducible OA corpus (2026-04-15)",
+        f"PRISMA Flow Counts — reproducible OA corpus ({date.today().isoformat()})",
         "=" * 56,
         "",
         "Identification:",
