@@ -43,9 +43,7 @@ src/helpers/                    PDF retrieval aids (not needed for reproduction)
   make_priority_list.py         Priority HTML list
   build_not_retrievable_html.py Interactive HTML for tracking manual downloads
 
-src/reports/                    Report generators (LIAA deliverables)
-  build_q1_report.py            Latvian Q1 literature review (.docx)
-  build_q1_deliverables.py      Full LIAA Q1 delivery package
+src/reports/                    Report generators
   build_slr_manuscript.py       LaTeX SLR paper + compile to PDF
 
 data/                           Supplementary data (tracked, for reproducibility)
@@ -104,7 +102,7 @@ Three steps in this SLR involved subjective human judgement:
 
 2. **PDF collection.** Full-text retrieval combined three sources: (i) a personal collection of relevant papers accumulated over two years of active research; (ii) open-access PDFs obtained programmatically via Unpaywall, OpenAlex, Semantic Scholar, and arXiv; and (iii) paywalled papers accessed through Riga Technical University's institutional library subscriptions. A researcher with different institutional access may obtain a partially different set. The 21 papers that were not available through any of these channels are documented in `not_retrievable.csv`.
 
-3. **Thematic narrative synthesis.** The cluster-level narratives (T1–T6 discussions) in the manuscript and Q1 report were written by the primary reviewer after reading the full-text corpus. A different reviewer reading the same papers may emphasise different aspects or draw partially different conclusions. The structured data (`paper_extractions.json`, `feature_frequency.csv`) is deterministic; the interpretive narrative is inherently reviewer-dependent.
+3. **Thematic narrative synthesis.** The cluster-level narratives (T1–T6 discussions) in the manuscript were written by the primary reviewer after reading the full-text corpus. A different reviewer reading the same papers may emphasise different aspects or draw partially different conclusions. The structured data (`paper_extractions.json`, `feature_frequency.csv`) is deterministic; the interpretive narrative is inherently reviewer-dependent.
 
 ### Step-by-step reproduction
 
@@ -143,9 +141,8 @@ python3 finalize_corpus.py
 #   → final_corpus.csv (196), not_retrievable.csv (21), prisma_flow_counts.txt
 python3 extract_paper_content.py
 
-# 6. Reports (optional — LIAA-specific)
+# 6. Manuscript (optional)
 cd reports
-python3 build_q1_report.py
 python3 build_slr_manuscript.py
 ```
 
