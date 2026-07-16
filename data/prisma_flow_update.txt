@@ -1,0 +1,35 @@
+PRISMA 2020 flow — original review and 2026 update search
+========================================================================
+Stage                                            Original       Update
+                                                2015-2025    2026 only
+------------------------------------------------------------------------
+Records identified (databases)                        913          515
+  Semantic Scholar                                    279           45
+  OpenAlex                                            400          400
+  arXiv                                                 9            8
+  Scopus                                              176           56
+  IEEE Xplore                                          49            6
+After deduplication                                   593          355
+  new to update (not in original)                       —          348
+After title screening                                 400          240
+After abstract screening                              217           71
+  INCLUDE                                             136           52
+  UNCERTAIN                                            81           19
+Full text retrieved (final corpus)                    196           71
+Not retrievable                                        21           14
+------------------------------------------------------------------------
+COMBINED CORPUS                                                    267
+
+Year distribution of combined corpus:
+  2015: 1
+  2016: 1
+  2017: 6
+  2018: 6
+  2019: 11
+  2020: 17
+  2021: 24
+  2022: 20
+  2023: 33
+  2024: 28
+  2025: 60
+  2026: 60

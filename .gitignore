@@ -52,8 +52,8 @@ templates/
 # ── Baseline trainer (proprietary data + model artifacts) ──
 src/baselineTrainerValidator/
 
-# ── Helpers (internal PDF fetch/download tools, not needed for reproduction) ──
-src/helpers/
+# ── Internal deliverables (LIAA reports, not part of the public pipeline) ──
+deliverables/
 
 # ── Report generators (LIAA/RTU deliverables, proprietary) ──
 src/reports/
@@ -67,3 +67,6 @@ manuscript_revision_instructions.md
 !data/
 !data/**
 src/experiments
+
+# ── Local API keys (never commit) ──
+.env.local

@@ -33,8 +33,9 @@ OUTPUTS = WORKSPACE / "outputs"
 TEXTS_DIR = OUTPUTS / "paper_texts"
 TEXTS_DIR.mkdir(parents=True, exist_ok=True)
 
-IN_CORPUS = OUTPUTS / "final_corpus.csv"
-OUT_JSON = OUTPUTS / "paper_extractions.json"
+import os
+IN_CORPUS = Path(os.environ.get("PRISMA_IN_CSV") or (OUTPUTS / "final_corpus.csv"))
+OUT_JSON = Path(os.environ.get("PRISMA_OUT_JSON") or (OUTPUTS / "paper_extractions.json"))
 
 # ── Keyword taxonomies ───────────────────────────────────────────────────────
 

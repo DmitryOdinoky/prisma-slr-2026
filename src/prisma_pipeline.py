@@ -20,8 +20,14 @@ from rapidfuzz import fuzz
 
 # ── Configuration ──────────────────────────────────────────────────────────────
 
-WORK_DIR = os.path.dirname(os.path.abspath(__file__))
+WORK_DIR = os.environ.get("PRISMA_OUT_DIR") or os.path.dirname(os.path.abspath(__file__))
 TODAY = date.today().isoformat()
+
+# Publication-year window. The original review (search of 2026-04-17) used
+# 2015--2025; the update search extends the upper bound to 2026. Override with
+# PRISMA_YEAR_MIN / PRISMA_YEAR_MAX to re-run either window.
+YEAR_MIN = int(os.environ.get("PRISMA_YEAR_MIN", "2015"))
+YEAR_MAX = int(os.environ.get("PRISMA_YEAR_MAX", "2025"))
 
 # API keys — set as environment variables before running.
 #   export SS_API_KEY="your-key"    (https://www.semanticscholar.org/product/api)
@@ -31,8 +37,10 @@ SS_API_KEY     = os.environ.get("SS_API_KEY", "")
 SCOPUS_API_KEY = os.environ.get("SCOPUS_API_KEY", "")
 IEEE_API_KEY   = os.environ.get("IEEE_API_KEY", "")
 
-if not all([SS_API_KEY, SCOPUS_API_KEY, IEEE_API_KEY]):
-    print("WARNING: API keys not set. Export SS_API_KEY, SCOPUS_API_KEY, IEEE_API_KEY.")
+if not all([SCOPUS_API_KEY, IEEE_API_KEY]):
+    print("WARNING: Scopus/IEEE keys not set. Export SCOPUS_API_KEY, IEEE_API_KEY.")
+if not SS_API_KEY:
+    print("NOTE: SS_API_KEY not set — using Semantic Scholar public tier (throttled).")
 
 STRINGS = {
     "A": '("ship" OR "vessel") AND ("fuel consumption" OR "speed prediction" OR "power prediction" OR "propulsion model") AND ("machine learning" OR "data-driven") AND ("sensor data" OR "operational data" OR "in-service data" OR "onboard data" OR "noon report" OR "voyage data")',
@@ -71,7 +79,7 @@ SS_QUERIES = {
 }
 
 # Scopus queries
-SCOPUS_QUERIES = {k: f'TITLE-ABS-KEY({v}) AND PUBYEAR > 2014 AND PUBYEAR < 2026' for k, v in STRINGS.items()}
+SCOPUS_QUERIES = {k: f'TITLE-ABS-KEY({v}) AND PUBYEAR > {YEAR_MIN - 1} AND PUBYEAR < {YEAR_MAX + 1}' for k, v in STRINGS.items()}
 
 # ── Title screening terms ──────────────────────────────────────────────────────
 
@@ -248,7 +256,17 @@ def next_id():
 def search_semantic_scholar():
     print("\n=== Semantic Scholar ===")
     base = "https://api.semanticscholar.org/graph/v1/paper/search"
-    headers = {"x-api-key": SS_API_KEY}
+    # An invalid or not-yet-activated key returns 403 on every call, which would
+    # silently zero out this database. Probe once and drop to the public tier
+    # (lower rate limit, same corpus) if the key is not live.
+    headers = {}
+    if SS_API_KEY:
+        probe = requests.get(base, params={"query": "ship", "limit": 1, "fields": "title"},
+                             headers={"x-api-key": SS_API_KEY}, timeout=30)
+        if probe.status_code == 200:
+            headers = {"x-api-key": SS_API_KEY}
+        else:
+            print(f"  key rejected (HTTP {probe.status_code}) — falling back to public tier")
     run = 1
     for sid in ["A", "B", "C", "D"]:
         subs = SS_QUERIES[sid]
@@ -259,10 +277,18 @@ def search_semantic_scholar():
         notes = f"API key; {len(subs)} sub-queries"
         for sq in subs:
             try:
-                resp = requests.get(base, params={
+                params = {
                     "query": sq, "fields": "title,authors,year,venue,externalIds,abstract",
-                    "limit": 100, "publicationDateOrYear": "2015:2025",
-                }, headers=headers, timeout=30)
+                    "limit": 100, "publicationDateOrYear": f"{YEAR_MIN}:{YEAR_MAX}",
+                }
+                # Public tier is aggressively rate-limited; back off and retry.
+                for attempt in range(6):
+                    resp = requests.get(base, params=params, headers=headers, timeout=30)
+                    if resp.status_code != 429:
+                        break
+                    time.sleep(2 ** attempt)
+                if not headers:
+                    time.sleep(3)
                 resp.raise_for_status()
                 data = resp.json()
                 total_hits += data.get("total", 0)
@@ -314,7 +340,7 @@ def search_openalex():
         notes = ""
         try:
             resp = requests.get(base, params={
-                "search": STRINGS[sid], "filter": "publication_year:2015-2025", "per-page": 100,
+                "search": STRINGS[sid], "filter": f"publication_year:{YEAR_MIN}-{YEAR_MAX}", "per-page": 100,
             }, timeout=30)
             resp.raise_for_status()
             data = resp.json()
@@ -384,7 +410,7 @@ def search_arxiv():
                 authors = ", ".join([a.text for a in entry.findall("a:author/a:name", ns) if a.text])
                 pub = entry.find("a:published", ns).text or ""
                 year = pub[:4] if pub else ""
-                if year and (int(year) < 2015 or int(year) > 2025): continue
+                if year and (int(year) < YEAR_MIN or int(year) > YEAR_MAX): continue
                 abstract = (entry.find("a:summary", ns).text or "").strip().replace("\n", " ")
                 url = entry.find("a:id", ns).text or ""
                 records.append({
@@ -466,7 +492,7 @@ def search_ieee():
         try:
             resp = requests.get("https://ieeexploreapi.ieee.org/api/v1/search/articles", params={
                 "apikey": IEEE_API_KEY, "querytext": STRINGS[sid],
-                "max_records": 100, "start_year": 2015, "end_year": 2025,
+                "max_records": 100, "start_year": YEAR_MIN, "end_year": YEAR_MAX,
             }, timeout=30)
             if resp.status_code == 403:
                 notes = "403 — key not activated"
@@ -607,11 +633,16 @@ def main():
         print(f"PRISMA SLR Pipeline — {TODAY}")
         print(f"Working directory: {WORK_DIR}\n")
 
-        search_semantic_scholar()
-        search_openalex()
-        search_arxiv()
-        search_scopus()
-        search_ieee()
+        # PRISMA_DATABASES limits which sources are queried (comma-separated:
+        # ss,openalex,arxiv,scopus,ieee). Used by the update search to re-query
+        # a single database without re-hitting rate-limited ones. Default: all.
+        want = os.environ.get("PRISMA_DATABASES", "ss,openalex,arxiv,scopus,ieee")
+        want = {d.strip().lower() for d in want.split(",") if d.strip()}
+        if "ss" in want:       search_semantic_scholar()
+        if "openalex" in want: search_openalex()
+        if "arxiv" in want:    search_arxiv()
+        if "scopus" in want:   search_scopus()
+        if "ieee" in want:     search_ieee()
 
         search_log.sort(key=lambda x: int(x["run_number"]))
 

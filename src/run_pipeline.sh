@@ -30,12 +30,13 @@ python3 finalize_corpus.py
 echo "=== Stage 8: Extract paper content (heuristic) ==="
 python3 extract_paper_content.py
 
-echo "=== Stage 9: Helpers for remaining manual fetch ==="
+echo "=== Stage 9: Click-list for the remaining manual fetch ==="
 cd helpers
 python3 find_links.py
-python3 paywalled_list.py
-python3 make_priority_list.py
 cd ..
+# Several open-access publishers block scripted downloads; generate the
+# publisher-grouped click-list and fetch the remaining PDFs in a browser:
+#   python3 helpers/build_manual_fetch_list.py --dir <output dir>
 
 echo ""
 echo "Pipeline complete."
@@ -43,6 +44,11 @@ echo "  Outputs: ../workspace/outputs/"
 echo ""
 echo "Next steps (manual):"
 echo "  1. Review paper_extractions.json for completeness"
-echo "  2. Write thematic narratives (T1–T6 cluster analysis)"
-echo "  3. Run report generators: cd reports && python3 build_q1_report.py"
-echo "  4. Compile manuscript: python3 build_slr_manuscript.py"
+echo "  2. Retrieve remaining PDFs via the generated HTML lists (browser pass;"
+echo "     several open-access publishers block scripted downloads)"
+echo ""
+echo "Update search (extend the year window, e.g. to include a new year):"
+echo "  PRISMA_YEAR_MIN=2026 PRISMA_YEAR_MAX=2026 PRISMA_OUT_DIR=<dir> python3 prisma_pipeline.py --all"
+echo "  python3 ss_reharvest.py --out <dir>      # Semantic Scholar, rate-limit tolerant"
+echo "  python3 merge_ss.py --dir <dir>          # merge + re-dedup + re-screen"
+echo "  python3 finalize_update.py               # combined corpus + PRISMA flow"

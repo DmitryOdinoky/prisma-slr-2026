@@ -18,9 +18,11 @@ import requests
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
-OUTPUTS = os.path.join(REPO_ROOT, "workspace", "outputs")
-IN_CSV = os.path.join(OUTPUTS, "title_screened.csv")
-OUT_CSV = os.path.join(OUTPUTS, "abstract_screened.csv")
+OUTPUTS = os.environ.get("PRISMA_OUT_DIR") or os.path.join(REPO_ROOT, "workspace", "outputs")
+# The update search screens only records new to the update; point these at the
+# update run's files via PRISMA_IN_CSV / PRISMA_OUT_CSV.
+IN_CSV = os.environ.get("PRISMA_IN_CSV") or os.path.join(OUTPUTS, "title_screened.csv")
+OUT_CSV = os.environ.get("PRISMA_OUT_CSV") or os.path.join(OUTPUTS, "abstract_screened.csv")
 
 # ── Abstract screening rule sets ─────────────────────────────────────────────
 
