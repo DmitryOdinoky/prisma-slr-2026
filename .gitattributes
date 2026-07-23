@@ -1,0 +1,6 @@
+# Normalise line endings: repo stores LF; working tree keeps LF too
+# (project is edited from both Windows and WSL).
+* text=auto eol=lf
+*.xlsx binary
+*.pdf binary
+*.edoc binary
