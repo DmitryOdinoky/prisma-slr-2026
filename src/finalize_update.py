@@ -131,6 +131,36 @@ def main():
             else:
                 notretr_new.append({**base, "reason": "no open-access PDF retrievable"})
 
+    # Full-text assessment of late-retrieved records (July 2026): records whose
+    # PDFs arrived after screening are assessed against the eligibility criteria;
+    # decisions and reasons in data/fulltext_assessment_2026-07.csv. INCLUDE ->
+    # corpus (original-arm PDFs live in pdfs_orig_recovered/); EXCLUDE-FT ->
+    # reported as excluded at full-text assessment, a standard PRISMA category.
+    ft_path = DATA / "fulltext_assessment_2026-07.csv"
+    ft = {r["dedup_id"]: r for r in load(ft_path)} if ft_path.exists() else {}
+    ft_excluded = {k for k, r in ft.items() if r["decision"] == "EXCLUDE-FT"}
+
+    rec_dir = WS / "pdfs_orig_recovered"
+    rec_have = {p.name.split("_")[0]: p for p in rec_dir.glob("*.pdf")
+                if p.stat().st_size >= 8192} if rec_dir.exists() else {}
+    still_nr = []
+    for r in orig_nr:
+        did = r["dedup_id"]
+        if did in ft_excluded:
+            continue
+        p2 = rec_have.get(did)
+        if p2:
+            corpus_new.append({"dedup_id": did, "title": r["title"],
+                "authors": r.get("authors", ""), "year": r.get("year", ""),
+                "venue": r.get("venue", ""), "doi": r.get("doi", ""),
+                "source_database": r.get("source_database", ""),
+                "abstract_screen": r.get("abstract_screen", ""),
+                "pdf_path": str(p2.relative_to(WS))})
+        else:
+            still_nr.append(r)
+    orig_nr = still_nr
+    notretr_new = [r for r in notretr_new if r["dedup_id"] not in ft_excluded]
+
     corpus_all = orig + corpus_new
     write(OUT / "final_corpus_updated.csv", corpus_all,
           ["dedup_id", "title", "authors", "year", "venue", "doi",
@@ -175,8 +205,12 @@ def main():
     L.append(f"{'After abstract screening':<44}{217:>13}{inc + unc:>13}")
     L.append(f"{'  INCLUDE':<44}{136:>13}{inc:>13}")
     L.append(f"{'  UNCERTAIN':<44}{81:>13}{unc:>13}")
-    L.append(f"{'Full text retrieved (final corpus)':<44}{196:>13}{len(corpus_new):>13}")
-    L.append(f"{'Not retrievable':<44}{21:>13}{len(notretr_new):>13}")
+    n_rec_o = sum(1 for r in corpus_new if r["dedup_id"] in rec_have)
+    L.append(f"{'Full text retrieved (final corpus)':<44}{196 + n_rec_o:>13}{len(corpus_new) - n_rec_o:>13}")
+    n_ft_o = sum(1 for k in ft_excluded if not k.startswith("U"))
+    n_ft_u = len(ft_excluded) - n_ft_o
+    L.append(f"{'Excluded at full-text assessment':<44}{n_ft_o:>13}{n_ft_u:>13}")
+    L.append(f"{'Not retrievable':<44}{len(orig_nr):>13}{len(notretr_new):>13}")
     L.append("-" * 72)
     L.append(f"{'COMBINED CORPUS':<44}{'':>13}{len(corpus_all):>13}")
     L.append("")

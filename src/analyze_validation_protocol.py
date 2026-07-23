@@ -35,7 +35,8 @@ REPO = Path(__file__).resolve().parent.parent
 TEXTS = REPO / "workspace" / "outputs" / "paper_texts"
 CORPUS = REPO / "workspace" / "outputs" / "update_2026_final" / "final_corpus_updated.csv"
 EXTR = [REPO / "workspace" / "outputs" / "paper_extractions.json",
-        REPO / "workspace" / "outputs" / "update_2026_final" / "extractions_2026_all.json"]
+        REPO / "workspace" / "outputs" / "update_2026_final" / "extractions_2026_all.json",
+        REPO / "workspace" / "outputs" / "update_2026_final" / "extractions_recovered.json"]
 OUT = REPO / "workspace" / "outputs" / "update_2026_final"
 
 # Signatures, checked most-rigorous first.

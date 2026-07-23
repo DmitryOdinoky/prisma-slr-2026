@@ -206,6 +206,7 @@ UREC-027,2026,temporal_holdout,0.982
 UREC-029,2026,temporal_holdout,
 UREC-031,2026,random_kfold,
 UREC-033,2026,unclear,
+UREC-035,2026,unclear,0.997
 UREC-039,2026,unclear,
 UREC-040,2026,unclear,
 UREC-046,2026,unclear,0.96
@@ -266,3 +267,7 @@ REC-102,2020,random_kfold,
 REC-218,2022,random_kfold,
 REC-319,2023,random_kfold,0.995
 REC-397,2019,random_kfold,
+REC-073,2020,random_kfold,
+REC-493,2025,random_kfold,
+REC-496,2023,unclear,0.917
+REC-497,2025,random_kfold,0.9999

@@ -1,0 +1,19 @@
+dedup_id,year,decision,reason,title
+REC-073,2020,INCLUDE,Ship energy performance prediction with ML on operational data (I1-I3 met),Neural network-based fuel consumption estimation for container ships in Korea
+REC-493,2025,INCLUDE,ANN fuel-consumption prediction from bulk-carrier noon reports (I1-I3 met),Evaluation of just in time strategy regarding carbon intensity indicator
+REC-496,2023,INCLUDE,Data-driven explainable ML for short-sea shipping energy efficiency from navigational data (I1-I3 met),Data-Driven Explainable Artificial Intelligence for Energy Efficiency in Short-Sea Shipping
+REC-497,2025,INCLUDE,MIMO ANN engine/ship performance decision support with real-time operational data (I1-I3 met),A data-driven decision support system for ship energy efficiency using MIMO artificial neural networks
+UREC-035,2026,INCLUDE,PCA+ANN fuel-consumption prediction from operational data (I1-I3 met),A hybrid model using PCA and ANN for predicting fuel consumption and emissions of mixed river–sea navigation ships
+REC-110,2023,EXCLUDE-FT,"E1: voyage speed optimisation via genetic algorithm; optimisation-core, no predictive-accuracy evaluation",VOYAGE SPEED OPTIMIZATION USING GENETIC ALGORITHM
+REC-162,2020,EXCLUDE-FT,"I1: predicts a control input (air-injection quantity for drag-reduction device), not a vessel performance parameter",Prediction of Drag Reduction Parameters of microbubbles Based on Multi-hidden Layer BP Neural Network Algorithm
+REC-351,2024,EXCLUDE-FT,Review article; no original quantitative accuracy results (I3 fail),An insight into the Application of AI in maritime and Logistics toward Sustainable Transportation
+REC-491,2025,EXCLUDE-FT,I2: fuzzy logic control system; no supervised prediction model with accuracy metrics,Development of a fuzzy control system for optimizing fuel consumption on ship main propulsion engines
+UREC-054,2026,EXCLUDE-FT,E4: SSRN preprint; no peer-reviewed published version found (Crossref: posted-content only),Operational drivers of fuel performance in Ro–Ro shipping
+UREC-080,2026,EXCLUDE-FT,"E1: image-based hull-cleanliness classification (inspection), not performance prediction",Image-Based Classification of Ship Hull Cleanliness Based on Transfer Learning
+UREC-149,2026,EXCLUDE-FT,E5: in-wheel motors for electric road vehicles; non-maritime,Fault diagnosis and fault-tolerant control of In-Wheel Motors: A review
+UREC-167,2026,EXCLUDE-FT,E4: one-page conference poster (grey literature),ADVANCED MACHINE LEARNING FOR SHIP RESISTANCE PREDICTION
+UREC-244,2026,EXCLUDE-FT,E1/E5: tsunami research review; out of scope,Review on tsunami research and risk mitigation: from prediction models to resilient coastal communities
+UREC-289,2026,EXCLUDE-FT,E1: deep-RL control of fish locomotion; not vessel performance prediction,Deep reinforcement learning control of fish locomotion via physics-guided surrogates
+UREC-294,2026,EXCLUDE-FT,E1: underwater navigation (INS/DVL/PS integration); out of scope,An INS/DVL/PS Integrated Underwater System Based on NLS-Transformer-LSTM Velocity Prediction Model
+UREC-296,2026,EXCLUDE-FT,E1: AUV design and manoeuvring; out of scope,Design of an Underwater Vehicle With Orientation-Adjustable Thrusters and Adaptive Tracking Control
+UREC-319,2026,EXCLUDE-FT,E5: smart-city digital twin/IoT; non-maritime,Digital Twin-Enabled IoT for Real-Time Predictive Analytics in Smart Cities

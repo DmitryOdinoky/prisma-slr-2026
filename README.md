@@ -17,8 +17,10 @@ strings across five databases, date-filtered to 2015–2026.
    → 640 after title screening
      → 302 after abstract screening (288 automated + 14 re-admitted
                                      by manual reviewer reconsideration)
-       → 267 full-text PDFs retrieved (final corpus)
-          35 not retrievable (documented)
+       → 272 full-text PDFs retrieved (final corpus)
+          13 excluded at full-text assessment (reasons in
+             data/fulltext_assessment_2026-07.csv)
+          17 not retrievable (documented)
 ```
 
 Per-search-arm stage counts are in `data/prisma_flow_update.txt`; the original
@@ -79,12 +81,13 @@ data/                           Supplementary data (tracked, for reproducibility
     title_screened_merged.csv   Title-screen verdicts (355 records)
     abstract_screened_merged.csv Abstract-screen verdicts
     PRISMA_search_results_update.xlsx  Full Excel workbook (update searches)
-  final_corpus_updated.csv      Combined 267-study corpus (final)
+  final_corpus_updated.csv      Combined 272-study corpus (final)
   not_retrievable_updated.csv   Combined 35 not-retrievable records
   prisma_flow_update.txt        Per-search-arm stage counts
   protocol_classification.csv   Per-paper validation-protocol assignment + headline R^2
   protocol_summary.json         Aggregates behind the manuscript's Table 2
   abstract_reconsider_2026-07.csv  Abstract-stage manual reconsideration audit trail
+  fulltext_assessment_2026-07.csv  Full-text assessment of late-retrieved records
 
 src/baselineTrainerValidator/   Baseline model (gitignored — proprietary data)
 workspace/                      PDFs, outputs, deliverables (gitignored)

@@ -15,10 +15,11 @@ After title screening                                 400          240
 After abstract screening                              217           71
   INCLUDE                                             136           52
   UNCERTAIN                                            81           19
-Full text retrieved (final corpus)                    196           71
-Not retrievable                                        21           14
+Full text retrieved (final corpus)                    200           72
+Excluded at full-text assessment                        4            9
+Not retrievable                                        13            4
 ------------------------------------------------------------------------
-COMBINED CORPUS                                                    267
+COMBINED CORPUS                                                    272
 
 Year distribution of combined corpus:
   2015: 1
@@ -26,10 +27,10 @@ Year distribution of combined corpus:
   2017: 6
   2018: 6
   2019: 11
-  2020: 17
+  2020: 18
   2021: 24
   2022: 20
-  2023: 33
+  2023: 34
   2024: 28
-  2025: 60
-  2026: 60
+  2025: 62
+  2026: 61
